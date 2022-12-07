@@ -3,7 +3,6 @@ button.square {
     border: 1px solid #999;
     float: left;
     font-size: 24px;
-    font-weight: bold;
     line-height: 34px;
     height: 34px;
     margin-right: -1px;
@@ -36,4 +35,8 @@ button.square {
 body {
     font: 14px "Century Gothic", Futura, sans-serif;
     margin: 20px;
+}
+
+.square > .winning-cell {
+    color: green;
 }

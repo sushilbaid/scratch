@@ -2,13 +2,14 @@ import React from 'react';
 import './TicTacToe.css';
 
 function Square(props) {
+    const desc = props.winning ? <span class="winning-cell">{props.value}</span> : props.value;
     return (
         <button 
             className='square' 
             onClick={props.onClick}
             disabled={props.disabled}
         >
-            {props.value}
+            {desc}
         </button>
     );
 }
@@ -16,7 +17,8 @@ function Square(props) {
 class Board extends React.Component {
     renderSquare(i, disabled) {
         return (
-            <Square 
+            <Square
+              winning={this.props.winningCells && this.props.winningCells.includes(i)} 
               value={this.props.values[i]}
               onClick={()=> this.props.onClick(i)}
               disabled={disabled}
@@ -54,8 +56,8 @@ class Board extends React.Component {
                     {this.renderSquare(0, d)}
                     {this.renderSquare(1, d)}
                     {this.renderSquare(2, d)}
-                </div>
-                <div className="board-row">
+            </div>
+            <div className="board-row">
                     {this.renderSquare(3, d)}
                     {this.renderSquare(4, d)}
                     {this.renderSquare(5, d)}
@@ -108,7 +110,7 @@ class Game extends React.Component {
         ];
         for (const [a,b,c] of winningPositionSets) {
             if (values[a] && values[a] === values[b] && values[b] === values[c]) {
-                return {winner: values[a], gameOver:true, values: values};
+                return {winner: values[a], winningCells: [a,b,c], gameOver:true, values: values};
             }
         }
 
@@ -156,6 +158,7 @@ class Game extends React.Component {
                      values={currentState.values}
                      nextPlayer={currentState.nextPlayer}
                      winner={currentState.winner}
+                     winningCells={currentState.winningCells}
                      gameOver={currentState.gameOver}
                      onClick={(i)=>this.handleClick(i)}
                       />
