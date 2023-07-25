@@ -20,9 +20,18 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
-
+    
     - name: Build
-      run: go build -v -o ./build/a ./go
+      run: go build -v -o ./build/dist/a ./go
 
     - name: Test
-      run: go test -v -o ./build/a  ./go
+      run: go test -v -o ./build/test/a  ./go
+
+    - name: archive build output
+      uses: actions/upload-artifact@v3
+      with: 
+        name: build-output
+        path: |
+          build/dist
+          
+    
