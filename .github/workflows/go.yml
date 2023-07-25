@@ -24,6 +24,9 @@ jobs:
     - name: Build
       run: go build -v -o ./build/dist/a ./go
 
+    - name: Test
+      run: go test -v -o ./build/test/a  ./go
+
     - name: archive build output
       uses: actions/upload-artifact@v3
       with: 
@@ -31,5 +34,4 @@ jobs:
         path: |
           build/dist
           
-    - name: Test
-      run: go test -v -o ./build/test/a  ./go
+    
