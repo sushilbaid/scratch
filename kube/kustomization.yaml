@@ -1,0 +1,9 @@
+configMapGenerator:
+- name: example-configmap-1
+  files:
+  - application.properties
+  envs:
+  - .env
+  literals:
+  - l1=wow
+  - l2=amazing
