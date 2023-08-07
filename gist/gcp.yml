@@ -1,0 +1,17 @@
+- iam:
+  name: identity and access management
+  principal: email with relevant prefix (e.g. user, serviceAccount, group, )
+  permission: operation allowed
+  role: collection of permissions (operations allowed) on a resource
+  policy: collection of (role, principal) bindings attached to a resource
+  examples:
+  - projects get-iam-policy <project> - list policy for a project
+  - projects add-iam-policy-binding <project> --member="serviceaccount:$A" --role=roles/iam.workloadIdentityUser
+  - iam service-accounts get-iam-policy gkeops@$P.iam.gserviceaccount.com - list policy for the service account
+  - iam service-accounts add-iam-policy-binding $A --member="principalSet://iam.googleapis.com/projects/<projectid>/locations/<location>/attribute.repository_owner/<owner>" --role=roles/iam.workloadIdentityUser --project=$P 
+    adds role binding to service account resource
+  - iam service-accounts create abc123
+    create service account
+  - iam service-accounts delete abc123@$P.iam.gservieaccounts.com
+    delete service account
+  
