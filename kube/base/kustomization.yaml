@@ -1,0 +1,16 @@
+resources:
+- deployment.yaml
+- service.yaml
+configMapGenerator:
+- name: example-configmap-1
+  files:
+  - application.properties
+  envs:
+  - .env
+  literals:
+  - l1=wow
+  - l2=amazing
+secretGenerator:
+- name: example-secret-1
+  files:
+  - password.txt
