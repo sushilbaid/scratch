@@ -14,5 +14,5 @@ CREATE TABLE accounts (
 --
 INSERT INTO accounts (name, notes, info)
 VALUES('Jazz Bush', 'last contacted supported on 2022-02-05', '{ "address": "13th Street, New York, NY 10011", "billing": "monthly" }'),
-      ('Jeff Gates ', 'support escalation to tier 2. temporary access to user account. account - jeffg. password="32#@$526"', '{ "address": "10th Street, Chicago, IL 60654", "billing": "quarterly" }'),
+      ('Jeff Gates ', 'support escalation to tier 2. temporary access to user account. account - jeffg. ', '{ "address": "10th Street, Chicago, IL 60654", "billing": "quarterly" }'),
       ('Cristian Bob', NULL, '{ "address": "124 NE main, Cambridge, MA 02149", "billing": "yearly" }');
