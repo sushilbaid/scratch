@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: kuard
+  labels:
+    env: test
+    app: kuard
+    ver: v1
+spec: 
+  containers:
+  - image: us-central1-docker.pkg.dev/civil-orb-388902/goserver/kuard:blue
+    name: kuard
+    livenessProbe:
+      httpGet:
+        path: /healthy
+        port: 8080
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 10
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 0
+      timeoutSeconds: 1
+      periodSeconds: 2
+      failureThreshold: 3
+      successThreshold: 1
+    ports: 
+    - containerPort: 8080
+      name: http
+      protocol: TCP
