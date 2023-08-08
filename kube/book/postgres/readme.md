@@ -22,4 +22,5 @@ kubectl exec -it pg-<hash-from-previous-command-output> -- bash
 # check tables. it will shows the logs table created in init.sql
 psql -Upostgres
 \dt
+select * from logs;
 ```
