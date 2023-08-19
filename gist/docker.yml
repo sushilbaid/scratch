@@ -1,0 +1,23 @@
+- network: network related commands
+  examples:
+  - network ls # list 3 default networks -- 1. bridge 2. none 3. host
+  - network inspect bridge # inspects and prints details e.g. subnet of the bridge network
+  - network create --driver=bridge --subnet=182.1.0.0/16 n1 # creates a custom network n1 of type bridge with given subnet 
+  - run -itd ubuntu # creates detached container with ubuntu image and connected to default bridge network
+  - ps # list running containers. cid is the id of the ubuntu container
+  - network connect n1 cid # connects container cid (ubuntu) from last step to network n1 apart from bridge
+  - inspect cid # cid container is now connected to two networks - bridge and n1
+  - network disconnect n1 cid # cid is only connected to bridge network
+  - network prune # removes all unused custom networks
+- container: container related commands
+  examples:
+  - ps -aq # id of all containers
+  - stop $(docker ps -aq) # stops all containers
+  - rm $(docker ps -aq) # removes all containers
+  - run -itd --net=n1 --name=t1 centos #runs centos based container connected to custom network n1 (not connected to bridge network)
+  - run -itd --name=t2 centos # t1 and t2 are on different networks and won't be able to communicate. e.g. ping t2 from t1 won't work
+    # ping will work after network connect n1 cid2 is used to connect t2 to n1 custom network
+  - volume create d1 # create a volume d1. data is stored in /var/lib/docker/volumes/d1/_data
+  - volume ls # lists volumes
+  - run -itd -v d1:/www ubuntu # mount the volume at /www in the ubuntu container (volume mounting). writing data in /www directory in container will write to _data directory mentioned in last step
+  - run -itd -v /home/sushil/data:/www ubuntu # directory in host at /home/sushil/data is bound (volume binding) to /www in container.
