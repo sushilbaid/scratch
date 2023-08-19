@@ -10,8 +10,24 @@
   - iam service-accounts get-iam-policy gkeops@$P.iam.gserviceaccount.com - list policy for the service account
   - iam service-accounts add-iam-policy-binding $A --member="principalSet://iam.googleapis.com/projects/<projectid>/locations/<location>/attribute.repository_owner/<owner>" --role=roles/iam.workloadIdentityUser --project=$P 
     adds role binding to service account resource
-  - iam service-accounts create abc123
-    create service account
-  - iam service-accounts delete abc123@$P.iam.gservieaccounts.com
-    delete service account
+  - iam service-accounts create abc123 # create service account
+  - iam service-accounts delete abc123@$P.iam.gservieaccounts.com # delete service account
+- services:
+  name: services management
+  examples:
+  - services list --available # list services available
+  - services list --enabled # list services enabled
+  - services enable cloudfunctions.googleapis.com # enables the service in the default project set by gcloud config set project
+- functions:
+  name: cloud functions
+  examples:
+  - create go files in the current directory # as per this sample https://github.com/GoogleCloudPlatform/golang-samples/tree/main/functions/functionsv2/helloworld
+  - functions deploy go-http-function --trigger-http --runtime=go120 --gen2 --region=us-central1 --source=. --entry-point=HelloGet --allow-unauthenticated # deploy go-http-function
+  - functions describe go-http-function # gives details of the function including url
+  - curl <function-url>
+
+
+
+
+    
   
