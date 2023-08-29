@@ -1,4 +1,4 @@
-module github.com/sushilbaid/scratch/gcp/functions
+module github.com/sushilbaid/scratch/gcp/functions/hello
 
 go 1.20
 
