@@ -21,3 +21,4 @@
   - volume ls # lists volumes
   - run -itd -v d1:/www ubuntu # mount the volume at /www in the ubuntu container (volume mounting). writing data in /www directory in container will write to _data directory mentioned in last step
   - run -itd -v /home/sushil/data:/www ubuntu # directory in host at /home/sushil/data is bound (volume binding) to /www in container.
+  - run -itd --mount type=bind,source=/home/sushil/data,target=/www ubuntu # same as above with parameters more explicit

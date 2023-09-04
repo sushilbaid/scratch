@@ -1,33 +1,140 @@
+- envs: # environment variables used in other commands
+  - export P="$(gcloud config get project)"  
+  - export A="gkeops@${P}.iam.gserviceaccount.com"
+- config:
+    examples:
+    - config configurations create # create named configuration
+    - config configurations describe default # describe a named configuration
+    - config get core/project # give value of project property under core section of config
+    - config set project <project> # set core section property
+    - config set artifacts/location us-central1 # sets artifacts location property
+- logging:
+    notes:
+    - billing - 0.5usd per gb one time streaming cost. first 50gb streaming free per month. retention cost 0.01 per gb per month after first month.
+    - no additional cost for analytics query, ingress, log routing
+    examples:
+    - logging write alog "logging - test1" # logs text log to log named "alog"
+    - logging write alog --payload-type=json # logs json payload to log named alog -- '{"p1": "p1-value", "p2":"p2value"}'
+    - logging read "logName=projects/$P/logs/alog" # gives logs based on the given filter in default yaml format
+- bigtable:
+    tablet: rows are sharded into contigous rows, called tablets. similar to regions in hbase.
+    node: earlier called tablet server, is part of a cluster. cluster with more number of nodes can process more requests simultaneously. if replication 
+     is enabled between multiple clusters, it can allow to route traffic to different clusters, enable failover etc.
+    column family: related columns are grouped by column family. column is identified by family and column qualifier
+    cell: each (row, column) contains multiple cells. cell contains timestamped data.
+    collossus: google file system used to store tablets data. it is stored in sstable format. data is written to shared log.
+    load balancing: tablet can be split or tablets may be merged based on workload. 
+    notes:
+    - table contains key/value pairs and massively scalable. 
+    - table is compacted periodically. at that time - deletion storage is reclaimed.
+    - compression of data less than 1mb is done and works best if it is placed next to each other. 
+    - single cluster is strongly consistent. multiple clusters is eventual consistent. read-your-writes consistency may be used to read latest written data.
+    -  in such case apps needs to be routed to single cluster using app profile.
+    - in case of replication conflict between clusters, last-write-win resolution is used
+    - backups allows schema and data to be backed up and restored to new table at a later time.
+    - data is stored encrypted at rest. CMEK (customer managed encryption keys) can be used.
+    - security can be managed at level of instance, and table. row level and downwards is not supported.
+    - perf - for burst load autoscaling will not help. min worker config can be increased. bad schema design can not be addressed by changing number of nodes.
+    -  in such cases, there may be hotspot nodes.
+    - with multiple cluster using app profiles - traffic may be routed e.g. for batch jobs and app to different clusters, or route to nearest cluster
+    - 
+    examples:
+    - cbt createinstance i1 "i1 instance" i1-c us-central1 ssd # create instance i1 with display name as "i1 instance" and single cluster i1-c in us-central1 region with ssd storage type
+    - edit ~/.cbtrc file with project=<project> and instance=i1
+    - cbt createtable t1 # table t1 in instance i1
+    - cbt createfamily t1 cf1 # create cf1 column family
+    - cbt set t1 r1 cf1:c1=c1-value # set (r1, cf1:c1) to c1-value
+    - cbt read t1 regex=r[1-9]* columns=cf1:c1 # read t1 content for rowkey matching regex and columns 
+    - cbt deletetable t1 # delete table t1
+    - cbt deleteinstance i1 # delete instance i1
 - iam:
-  name: identity and access management
-  principal: email with relevant prefix (e.g. user, serviceAccount, group, )
-  permission: operation allowed
-  role: collection of permissions (operations allowed) on a resource
-  policy: collection of (role, principal) bindings attached to a resource
-  examples:
-  - projects get-iam-policy <project> - list policy for a project
-  - projects add-iam-policy-binding <project> --member="serviceaccount:$A" --role=roles/iam.workloadIdentityUser
-  - iam service-accounts get-iam-policy gkeops@$P.iam.gserviceaccount.com - list policy for the service account
-  - iam service-accounts add-iam-policy-binding $A --member="principalSet://iam.googleapis.com/projects/<projectid>/locations/<location>/attribute.repository_owner/<owner>" --role=roles/iam.workloadIdentityUser --project=$P 
-    adds role binding to service account resource
-  - iam service-accounts create abc123 # create service account
-  - iam service-accounts delete abc123@$P.iam.gservieaccounts.com # delete service account
+    name: identity and access management
+    principal: email with relevant prefix (e.g. user, serviceAccount, group, )
+    permission: operation allowed
+    role: collection of permissions (operations allowed) on a resource
+    policy: collection of (role, principal) bindings attached to a resource
+    examples:
+    - iam service-accounts create abc123 # create service account
+    - iam service-accounts delete abc123@$P.iam.gservieaccounts.com # delete service account
+    - projects get-iam-policy <project> - list policy for a project
+    - projects add-iam-policy-binding <project> --member="serviceAccount:$A" --role=roles/artifactregistry.writer
+    - iam service-accounts get-iam-policy gkeops@$P.iam.gserviceaccount.com - list policy for the service account
+    - iam workload-identity-pools create pool1 --location=global # create workload identity pool
+    - iam workload-identity-pools providers create-oidc github-provider --location=global --project=$P --workload-identity-pool=pool1 --display-name="github identity provider" --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" --issuer-uri="https://token.actions.githubusercontent.com" # create oidc workload identity provider
+    - iam service-accounts add-iam-policy-binding $A --member="principalSet://iam.googleapis.com/projects/<projectid>/locations/<location>/workloadIdentityPools/pool1/attribute.repository_owner/<owner>" --role=roles/iam.workloadIdentityUser --project=$P 
+      adds role binding to service account resource
+- container:
+    examples:
+    - container clusters create-auto c1 --region=us-central1 # create an autopilot gke cluster
+    - container clusters get-credentials c1 --region=us-central1 # fetch credentials for the cluster c1
 - services:
-  name: services management
-  examples:
-  - services list --available # list services available
-  - services list --enabled # list services enabled
-  - services enable cloudfunctions.googleapis.com # enables the service in the default project set by gcloud config set project
+    name: services management
+    examples:
+    - services list --available # list services available
+    - services list --enabled # list services enabled
+    - services enable cloudfunctions.googleapis.com # enables the service in the default project set by gcloud config set project
 - functions:
-  name: cloud functions
-  examples:
-  - create go files in the current directory # as per this sample https://github.com/GoogleCloudPlatform/golang-samples/tree/main/functions/functionsv2/helloworld
-  - functions deploy go-http-function --trigger-http --runtime=go120 --gen2 --region=us-central1 --source=. --entry-point=HelloGet --allow-unauthenticated # deploy go-http-function
-  - functions describe go-http-function # gives details of the function including url
-  - curl <function-url>
-
-
-
-
-    
-  
+    name: cloud functions
+    examples:
+    - create go files in the current directory # as per this sample https://github.com/GoogleCloudPlatform/golang-samples/tree/main/functions/functionsv2/helloworld
+    - functions deploy go-http-function --trigger-http --runtime=go120 --gen2 --region=us-central1 --source=. --entry-point=HelloGet --allow-unauthenticated # deploy go-http-function
+    - functions describe go-http-function # gives details of the function including url
+    - curl <function-url>
+- storage:
+    name: google storage
+    object: identified by name and generation number is generated by gc. having randomness in name (instead of sequenceness) helps distribute load and 
+      auto-scale read/write well from otherwise default 5000/1000 read/write per second. e.g. my-bucket/2fa764-2016-05-10-12-00-00/file1.
+      note the 6 character hash prefix before sequencial timestamp prefix. virtual hiearchy is supported by the cli; there is no sub-directory in bucket.
+      hence deeply nested directory lookup will not perform well. object are replaced atomically.
+    security: 
+    - iam based policy can be applied at bucket level (recommended). else acls at level of objects can be applied.
+    - once uniform access based on iam is enabled, acls based access is disabled. it can be reverted upto 90 days. 
+    - public access can be granted using role/storageView for allusers (iam policy). similarly for acls.
+    lifecycle:
+    - lifecycle config can be set for the bucket. it is a collection of rules. rule is a pair of action & conditition. 
+    - rule allows to delete, set storage class and abort incomplete multipart uploads
+    - conditions can be age since creation time, since non current time, num of versions etc.
+    - sample config file and details https://cloud.google.com/storage/docs/lifecycle-configurations
+    - object may be put on hold. on such objects, retention lifecycle policy is not applied.
+    examples:
+    - storage objects update gs://bucket-a/Dockerfile --add-acl-grant=entity=allUsers,role=READER # give access to all users
+    - storage objects update gs://bucket-a/Dockerfile --remove-acl-grant=allUsers,role=READER # remove access for all users
+    - storage buckets describe gs://bucket-a --format="default(default_acl)" # check default acls defined at bucket level
+    - storage buckets update gs://bucket-a --uniform-bucket-level-access  #enable uniform bucket level iam based access
+    - storage buckets update gs://bucket-a --no-uniform-bucket-level-access  #disable uniform bucket level iam based access
+    - storage buckets update gs://bucket-a --lifecycle-file=lifecyclefile.json # update lifecycle config for the bucket
+    - storage buckets update gs://bucket-a --clear-lifecycle # clear lifecycle config
+    - export B=gs://sushil-baid-temp
+    - storage buckets create $B # create bucket
+    - storage buckets create gs://sushil-baid-a #another bucket
+    - storage cp -r . $B
+    - storage cp -r $B gs://sushil-baid-a
+    - storage buckets update $B --update-labels=tag1=v1 # add label
+    - storage buckets update $B --clear-labels #clear all labels
+    - storage buckets describe $B --format="value(labels)"
+    - storage rm -r $B # remove content and bucket
+    - storage rm --all-versions "$B"/** # remove all content but bucket
+    client-library-go-examples:
+    - tbd
+    client-library-python-examples:
+    - tbd
+    upload-downloads:
+    - tbd
+    signed-url:
+    - tbd
+    migrate-from-aws:
+    - tbd
+    monitoring:
+    - tbd
+    enryptions:
+    - encryption may use customer supplied keys and client side encryption in addition.
+    - tbd
+- pubsub:
+    notes:
+    - pricing starts at usd40 per tib
+    - roles/pubsub.admin/editor/publisher/subscriber/viewer
+    examples:
+    - pubsub topics create tp1 # create topic tp1
+    - pubsub subcriptions create stp1 --topic=tp1 # create subscription stp1 for topic tp1
+    - pubsub topics publish tp1 --message="hi tp1" # public message to topic tp1
+    - pubsub subcriptions pull stp1 # pull message from subscription stp1
