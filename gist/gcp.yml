@@ -47,6 +47,17 @@
     - cbt read t1 regex=r[1-9]* columns=cf1:c1 # read t1 content for rowkey matching regex and columns 
     - cbt deletetable t1 # delete table t1
     - cbt deleteinstance i1 # delete instance i1
+- bigquery:
+    notes:
+    - data analytics platform. allow to create datasets, query tables in datasets and export data.
+    - billing is for compute(analysis) and storage need.
+    - compute billing is 
+    - 1. on demand (bytes processed). depends on the size of columns and rows scanned. clustering and partitioning of tables can help.
+    -  quotas may be used per user, project, query. first tb is free. thereafter per tb around usd 6.
+    - 2. capacity commitment based. charged based on slot hr. e.g. 0.04 slot hr. editions - standard, enterprise, enterprise plus. 
+    - have optional reservation for 1 yr/3 yr with discounts for slot hr billing rate.
+    - storage billing is based on active vs long term storage. table partitions not modified for 90 days are considered longterm storage.
+    - first 10Gib is free per month. 
 - iam:
     name: identity and access management
     principal: email with relevant prefix (e.g. user, serviceAccount, group, )
@@ -129,6 +140,36 @@
     enryptions:
     - encryption may use customer supplied keys and client side encryption in addition.
     - tbd
+- secret-manager:
+    notes:
+    - manages secrets like password, credentials. can be auto-rotated using cloud functions. latest version may be pinned to a version for requests. 
+    - audit logs for ops. replicated to selected regions. only project owners have default access.
+    - access roles - roles/secretmanager.admin, secretAccessor, secretVersionAdder, secretVersionManager, viewer
+    - keeping secret name and version in app config is one good practice to avoid service downtime because of bad secret rollout.
+    - secret scheduled rollout enables system with process to deal with any emergency that requires secret rotation.
+    - can send message pubsub topic based on rotation-period
+    examples:
+    - echo -n "secret data" | gcloud secrets create a --data-file=- # create secret
+    - secrets versions access latest --secret=a # access latest/version of secret a
+    - secrets update a --next-rotation-time 2021-06-01T09:00:00Z --rotation-period="2592000s" --add-topics="secret-expiry" # notifies for rotation
+    - secrets update a --remove-next-rotation-time
+    - secrets update a --remove-rotation-schedule
+- networking:
+    notes:
+    - VPC is virtual private cloud and is based on software defined network. uses private networking and ip addressing standard (rfc 1918).
+    - not exposed to internet. ingres is free. egress traffic has a cost. gcp resources uses the google networking infra. it includes 20 regions. 
+    - region includes multiple zones. POP (edge point of presence) is where google's network connect to rest of internet. over 130 exchange points.
+    - all traffic between gcp resources across regions is over google's private network. never touch public internet. better security, routing, perf.
+    - regions - geographical areas that host gcp data centers. zones - deployment areas for gcp resources within a region. 
+    - projects separate users where as VPCs separate systems. by default project can have upto 5 vpc. quota may be increased.
+    - subnets defined using cidr notation for network/host division. private ip ranges (172.16.x.x/10.x.x.x/192.168.x.x). 
+    - subnetting: 
+      - dividing network address space. subnet may span zones in a region. e.g. us-central1-a/b/c. 
+      - subnet modes - default, auto mode, custom. default is automode + premade firewall rules. automode creates subnets for all 20 regions.
+      - custom mode need to create self. automode at times causes overlapping subnets when connecting vpcs for vpn/peering.
+      - subnet reserved addresses - 0 - network, 1 - gateway, 254 - reserved, 255 - broadcast.
+      - subnet primary address range for vm, secondary address range for multiple vms or containers on machine. 
+      - subnet 
 - pubsub:
     notes:
     - pricing starts at usd40 per tib
