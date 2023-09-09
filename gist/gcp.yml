@@ -164,12 +164,39 @@
     - projects separate users where as VPCs separate systems. by default project can have upto 5 vpc. quota may be increased.
     - subnets defined using cidr notation for network/host division. private ip ranges (172.16.x.x/10.x.x.x/192.168.x.x). 
     - subnetting: 
-      - dividing network address space. subnet may span zones in a region. e.g. us-central1-a/b/c. 
+      - dividing network address space. subnetting is logical partitioning of network. subnet may span zones in a region. e.g. us-central1-a/b/c. 
       - subnet modes - default, auto mode, custom. default is automode + premade firewall rules. automode creates subnets for all 20 regions.
-      - custom mode need to create self. automode at times causes overlapping subnets when connecting vpcs for vpn/peering.
+      - custom mode need to create subnets manually. automode at times causes overlapping subnets when connecting vpcs for vpn/peering. automode vpcs cannot be peered
       - subnet reserved addresses - 0 - network, 1 - gateway, 254 - reserved, 255 - broadcast.
       - subnet primary address range for vm, secondary address range for multiple vms or containers on machine. 
-      - subnet 
+      - subnet range can be expanded e.g. from /20 to /16 but not shrink.
+    - ip_address:
+      - internal dns names e.g. instance1.c.<project_id>.internal. ephemeral. assigned from  dhcp pool.
+      - external ip address is optional. ephemeral. assigned when running. released on stop/delete. reserved (static) billed when not in used.
+      - no default external dns. cloud DNS service to be used.
+      - multiple ips (nics) per vm desired for cases like control plane, data plane seperation. upto 2 cpus - 2 nics. thereafter 1 nic per cpu upto 8 nics.
+    examples:
+    - compute networks create n1 --subnet-mode=custom # create custom network n1
+    - compute networks subnets create n1 --region=us-central1 --network=n1 --range=10.1.2.0/24 # create a subnet in network n1 for region us-central1
+    - compute firewall-rules create n1-allow-ssh --allow=tcp:22 --priority=1000 --source-ranges=35.235.240.0/20 --network=n1 # enable ssh-from-browser from gcp console for n1 network
+    - compute instances vm1 --network=n1 --subnet=n1 --zone=us-central1-c # create a vm connected to network n1
+    - # use google console to ssh-from-browser to VM vm1
+    - compute networks subnets expand-ip-range n1 --region=us-central1 --prefix-length=20 # expand ip range to 10.1.0.0/20 for the subnet
+    - compute instances delete vm1 --zone=us-central1-c # delete the vm
+    - compute networks subnets delete n1 --region=us-central1 # delete subnet n1 in region us-central1
+    - compute networks delete n1 # delete custom network n1
+    - compute addresses create public-ip1 # create static external ip address
+    - compute instances create vm1 --zone=us-central1-c --machine-type=e2-small --network-interface=network=n1,subnet=n1 --network-interface=network=n2,subnet=n2,address=public-ip1 # create vm with two nics connected to two networks and static public-ip1
+    - compute firewall-rules create n1-allow-ping2 --allow=icmp --target-tags=allow-ping --source-ranges=172.16.1.0/24 --network=n1 # allow ping to targets tagged allow-ping from given source ranges on network n1
+    - compute firewall-rules create n1-deny-ping2 --direction=out --rules=icmp --action=deny --target-tags=deny-ping  --network=n1 --priority=999 # deny ping egress (out) from targets tagged deny-ping
+    - compute ssh vm1 # ssh to vm1
+
+
+
+
+
+
+
 - pubsub:
     notes:
     - pricing starts at usd40 per tib
