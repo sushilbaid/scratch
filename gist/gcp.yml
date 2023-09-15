@@ -172,9 +172,23 @@
       - subnet range can be expanded e.g. from /20 to /16 but not shrink.
     - ip_address:
       - internal dns names e.g. instance1.c.<project_id>.internal. ephemeral. assigned from  dhcp pool.
-      - external ip address is optional. ephemeral. assigned when running. released on stop/delete. reserved (static) billed when not in used.
+      - external ip address is optional. ephemeral. assigned when running. released on stop/delete. reserved (static) billed when not in used also.
       - no default external dns. cloud DNS service to be used.
       - multiple ips (nics) per vm desired for cases like control plane, data plane seperation. upto 2 cpus - 2 nics. thereafter 1 nic per cpu upto 8 nics.
+    - routing:
+      - defines paths of network traffic from vpc resource to other destinations. each route has a single destination + single next hop.
+      - subnet routes cannot be deleted. custom routes can be created manually or by cloud router.
+      - public and private nat. public nat provides public internet connectivity to resources without public ip. private nat may be used for connectivity 
+      - between vpcs with overlapping subnets. clout nat is not a separate device or vm. it runs some process on each vm. source and destination (snat/dnat) is 
+      - done by the software. 
+      - for public nat - 1. create cloud router for vpc and region 2. create nat gateway for the cloud router for selected or all subnets 
+      - 3. check the routes for the subnet. they would go thru nat gateway.
+    - security:
+      - roles - networkadmin (network resources crud), securityadmin (firewall, sslcert crud), computeinstanceadmin (gce crud), networkuser, networkviewer
+      - connect to windows vm over rdp, iap (identity-aware-proxy tcp forwarding) client, sac(special administrative console over interactice serial console)
+      - user need to have roles/iap.tunnelResourceAccessor role for iap access to resource. roles/compute.instanceadmin.v1 for ssh access.
+      - iap access enables remote access without vm having public ip. iap access can be assigned using iam to specific users(,projects, folders etcs.) 
+      - for specific resources (vm instances). firewall rules can enable iap traffic to vms on vpc.
     examples:
     - compute networks create n1 --subnet-mode=custom # create custom network n1
     - compute networks subnets create n1 --region=us-central1 --network=n1 --range=10.1.2.0/24 # create a subnet in network n1 for region us-central1
@@ -190,13 +204,10 @@
     - compute firewall-rules create n1-allow-ping2 --allow=icmp --target-tags=allow-ping --source-ranges=172.16.1.0/24 --network=n1 # allow ping to targets tagged allow-ping from given source ranges on network n1
     - compute firewall-rules create n1-deny-ping2 --direction=out --rules=icmp --action=deny --target-tags=deny-ping  --network=n1 --priority=999 # deny ping egress (out) from targets tagged deny-ping
     - compute ssh vm1 # ssh to vm1
-
-
-
-
-
-
-
+    - compute routers  create cr1 --project=$P --network=n1 --region=us-central1 #create cloud router for network n1
+    - compute routers nats create cn1 --router=cr1 --region=us-central1 --auto-allocate-nat-external-ips --nat-all-subnet-ip-ranges --enable-logging
+    - compute instances create vm1 --machine-type=e2-small --zone=us-central1-f --network-interface=network=n1,subnet=n1,no-address # create vm without external ip on network n1
+    - add firewall rules to allow ssh to vm; ssh to vm; curl http://google.com # vm without external ip able to access internet through nat
 - pubsub:
     notes:
     - pricing starts at usd40 per tib
