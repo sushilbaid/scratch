@@ -1,0 +1,10 @@
+macos-update-ruby: 
+- macos comes with builtin install of ruby although gems can not be installed. 
+- e.g. gem install net-http-persistent will fail that it can not write permissions for the folder
+- reference - https://stackoverflow.com/questions/51126403/you-dont-have-write-permissions-for-the-library-ruby-gems-2-3-0-directory-ma
+- solution as per above reference will require 
+- 1. brew install chruby ruby-install; update .zshrc as advised during install; restart terminal
+- 2. ruby-install ruby
+- 3. restart terminal
+- 4. chruby 3.3.0 # version should be same as installed by step 2
+- after this gem install net-http-persistent will work
