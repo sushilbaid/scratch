@@ -1,2 +1,4 @@
 go/in
 **/node_modules
+**/*zip
+**/out
