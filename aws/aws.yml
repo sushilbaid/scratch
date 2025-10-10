@@ -1,0 +1,52 @@
+- s3:
+  - export B="s3://s1.t1"
+  - s3 mb $B # create bucket 
+  - s3 rb $B # remove bucket
+  - s3 cp ./d1/ 
+- vpc
+- subnets
+- alb_target_group:
+  - config = protocol, port, vpc, health_check, lifecycle
+- alb:
+  - config = security groups (sgs), access_logs, subnets, internal, lifecycle
+- alb_listener:
+  - config = protocol, port, ssl_policy, certificate_arn, alb_arn, action {target_group_arn, type=forward,redirect}
+- launch template:
+  - config = name_prefix, instance_type, image_id, iam_instance_profile {arn}, key_name, metadata_options, user_data, dynamic block_device_mappings
+- asg:
+  - config = min_size, max_size, launch template, [vpc_zone_id], [target_group_arn], instance_refresh, instance_maintenance_policy
+- iam:
+  - role:
+    - like user but without long term credentials e.g. password or access keys
+    - get assigned permissions to do a set of actions on resources
+    - temp credentials aka access token are provided by sts (secure token service) when role is asummed
+    - service role:
+      - service role can be thought as service account created by iam admins. 
+      - it enables the selected service principal e.g. ec2 service principal to 'assume' the role
+      - aws ec2 instance role is an special case of this. it can be assumed by applications running the in the ec2 instance.
+      - service-linked role is a type of service role in aws account, owned by service. iam admin can view, but not edit the permissions.
+    - role may be chained. e.g. role1 may be allowed to assume rol2. it is considered chaining and token in such case is max valid for an hour.
+    - aws ec2 instance role when assumed by application running in the vm is not considered role chaining.
+    - role delegation can be enabled through switch role between two aws accounts. it requires trust setup between the accounts.
+    - federation between aws and OIDC (open id connect)/saml (security assertion markup language) compatible identity provider (idp) can be setup.
+    - in such case, user gets assigned a role and gets a token
+  - permissions policy:
+    - json document that contains list of "actions on resources" available to the role. it is attached to a role in iam.
+  - resource based policies:
+    - some resource directly grant permissions to principals through resource based policy
+    - example of such resources - s3 storage, sqs (simple queue service), sns (simple notification service)
+    - trust policy:
+      - trust policy on iam role (resource) is a resource based policy. it declares trusted principals that can assume the role.
+      -  since iam role is identity as well as resource, trust policy can be assigned to an iam role.
+      - user name can be thought as case of single principal name. in which case trust policy essentially becomes permissions for a user.
+  - identity based policies:
+    - such policies are attached to identities e.g. user, group, or role.
+    - list of permissions. in other words, "actions on resources under what condition"
+    - can be created by json policy document.
+    - catogories: 
+      1: managed policies - aws managed, customer managed aka custom policies.
+      2: inline policies - discouraged. embedded in user, group, or role identity.
+- ssm:
+  - ssm get-parameter --name <name> --with-decryption
+- overview:
+  - arn (aws resource name) format is #Arn : partition : service : region : account: parameters

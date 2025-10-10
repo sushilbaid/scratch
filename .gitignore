@@ -2,3 +2,6 @@ go/in
 **/node_modules
 **/*zip
 **/out
+py/**/__pycache__/**
+py/**/.pytest_cache/**
+**/.terraform/**

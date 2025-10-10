@@ -1,0 +1,97 @@
+- zookeeper: 
+  - apache open source project to provider coordination service for distributed application.
+  - znodes:
+    - each node can have data and children. think of this as file system where files can be directory as well.
+    - ephemeral nodes are deleted once session that created it, is gone.
+    - each node has version that is updated on updates. updates are atomic. node has acls.
+    - client can add watch. means receive notification on znode change
+  - apis:
+    - create, delete, exists, get/set data, get children, sync
+  - high on performance, availablility and strictly ordered access.
+  - replicated over hosts called an ensemble
+- waap - web application and api protection
+- HCL - hashicorp configuration language
+- libs:
+  - libffi-dev foreign function interface provides calling convention abstraction for higher language impl.
+  - libgmp-dev - gnu multi precision lib provides precision arithmetic on signed integers, rational numbers and floating point numbers.
+  -  used mostly by math research, cypto, security projects
+  - zlib1g-dev zlib provides impl of deflat compression method found in gzip and pkzip
+  - libpq-dev headers and static lib for postgres db backend
+  - libzookeeper-mt-dev multi threaded c binding for zookeeper
+- codenames:
+  - debian: linux destro. ubuntu is mature child of debian linux.
+  - bullseye: debian 11
+  - bookworm: debian 12
+  - buster: debian 10
+  - xenial: ubuntu 16.04
+  - bionic beaver: ubuntu 18.04
+  - focal fossa: ubuntu 20.04
+  - jammy jellyfish: ubuntu 22.04
+- vagrant: 
+  - tool to create vms using providers for virtualbox etc. configuration can be committed to source control.
+  - paired up with ansible allows to provision vms
+- packer:
+  - enabled automatation of creation of vm images e.g. aws ami (amazon machine image). 
+  - packer has been acquired by hashicorp 
+- unix-example-commands:
+  - systemctl start  redis-server
+  - systemctl stop postgresql 
+  - look for debian packages at e.g. https://packages.debian.org/bullseye
+- mac-example-commands:
+  - brew services start postgresql@10
+- psql-example-commands:
+  - du - list users
+  - df - list functions
+  - dt - list tables
+  - l - list database
+  - c db - connect to debian
+  - q - quit
+  - -Uuser - connect a user
+- pyenv:
+  - tool for managing python versions. py version manager.
+  - pyenv root is typically ~/.pyenv say pyenv_root
+  - python versions are installed under $pyenv_root/versions
+  - python packages are installed by pip under e.g. $pyenv_root/versions/3.11.5/lib/python3.11/site-packages
+- pip:
+  - package installer for python
+  - installs packages from pypi.org (python package index)
+  - may install packages from git, source distribution (sdist), wheel distribution
+- pipenv:
+  - tool to manage python virtualenvs
+  - pip install --user pipenv # install under ~/.local/bin
+  - virtual environments are created under ~/.local/share/virtualenvs # e.g. /home/user1/.local/share/virtualenvs/user1-dGCnura7
+  - while pip manages package dependencies using requirements.txt, pipenv uses Pipfile. it is able to deal with package interdependencies in addition.
+
+  - examples:
+    - pipenv --python 3.10 # creates virtualenv with 3.10.x python
+    - --venv # location of venv 
+    - --rm # removes venv for the current folder
+    - install --dev # install dependencies including development dependencies
+- toml:
+  - serialization format like json, yaml
+  - tables are with headers e.g. [mytable]
+  - key pairs are put as a=b
+  - array of tables can be put under headling [[sources]] # e.g. {"sources": [{"name":"source1"}, {"name": "source2"}]} in json
+- linux:
+  - /dev/sda1 (scsi disk [a|b|c..z]n where n is partition number)
+  - commands:
+    - sh - default shell for the os. /usr/bin/sh
+    - echo "date" | sh -s - --utc # -s to reinvoke the shell command. 
+    # - or -- are same
+    # -- simply signals the end of options and that any following tokens are arguments (not options) even if they start with a dash -.
+    - dpkg -S /usr/bin/python3 # prints package that contains the given file
+    - dpkg -l # list of packages
+    - dpkg -L python3-minimal # list of files that belong to python3-minimal package
+    - echo "item1 item2" | cut -d ' ' -f2 # prints item2
+    - sudo -u user1 <cmd> # run command as user1
+    - 
+- packer tool:
+  - tool to create ami (amazon machine image)
+  - packer build -debug -var version=$(version) packer/template.json # build ami in debug mode
+- behave tool:
+  - behave -n "scenario name" # runs only the given scenario
+- curl:
+  - -si switch - silent to not shown progress etc and include response headers
+- json hal:
+  - JSON Hypertext Application Language (HAL) 
+  - api response to include related resources link
