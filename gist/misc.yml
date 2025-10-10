@@ -95,3 +95,7 @@
 - json hal:
   - JSON Hypertext Application Language (HAL) 
   - api response to include related resources link
+- redis:
+  - setup in docker.
+  - d network create redis # create network redis
+  - d 
