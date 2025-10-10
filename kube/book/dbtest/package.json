@@ -1,0 +1,14 @@
+{
+  "name": "dbtest",
+  "version": "1.0.0",
+  "description": "api to test connectivity with postgres, mysql databases",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sushil baid",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  }
+}

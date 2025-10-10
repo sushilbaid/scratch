@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: d1
+  labels:
+    app: d1
+    env: prod
+    ver: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: d1
+  template:
+    metadata:
+      labels:
+        app: d1
+        env: prod
+        ver: v1
+    spec:
+      containers:
+      - image: us-central1-docker.pkg.dev/wide-memento-398004/images/kuard:blue
+        name: d1
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP

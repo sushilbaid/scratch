@@ -6,7 +6,7 @@ steps:
 # create config for initialization script for database
 kubectl create configmap init-sql --from-file=init.sql
 # create secret for root password
-kubectl create secret pwd --from-literal=MYSQL_ROOT_PASSWORD=mysql
+kubectl create secret generic pwd --from-literal=MYSQL_ROOT_PASSWORD=mysql
 # provision persistent volume
 kubectl apply -f pvc.yaml
 # deploy mysql
