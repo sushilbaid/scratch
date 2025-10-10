@@ -1,0 +1,7 @@
+- authentication
+  - someone is authenticated based on various factors. what he knows, what he has, what he is or does 
+  - knowledge - password etc
+  - has - token device, totl 
+  - is - retina pattern, dna, fingerprint 
+- authorization 
+  - function of specifing access rights/privileges to resources

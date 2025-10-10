@@ -1,0 +1,11 @@
+name: z
+services:
+  zoo:
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo:2888:3888;2181
+    hostname: zoo
+    image: zookeeper:3.8
+    ports:
+    - 2181:2181
+    restart: always
